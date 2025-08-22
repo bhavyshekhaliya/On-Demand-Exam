@@ -1,0 +1,126 @@
+{% extends 'exam_system/base.html' %}
+
+{% block title %}View Results - Student{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Your Exam Results</h2>
+    <p>View your performance in all completed exams.</p>
+</div>
+
+<div class="card">
+    <h3>Completed Exams with Results</h3>
+    {% if answer_sheets %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Exam Date</th>
+                    <th>Total Marks</th>
+                    <th>Marks Obtained</th>
+                    <th>Percentage</th>
+                    <th>Grade</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for paper in answer_sheets %}
+                {% if paper.marks_obtained %}
+                <tr>
+                    <td>{{ paper.exam.subject.name }}</td>
+                    <td>{{ paper.exam.start_date }} - {{ paper.exam.end_date }}</td>
+                    <td>{{ paper.exam.total_marks }}</td>
+                    <td>{{ paper.marks_obtained }}</td>
+                    <td>
+                        {% widthratio paper.marks_obtained paper.exam.total_marks 100 %}%
+                    </td>
+                    <td>
+                        {% if paper.marks_obtained >= paper.exam.total_marks|add:"-10" %}
+                            <span style="color: green;">A+</span>
+                        {% elif paper.marks_obtained >= paper.exam.total_marks|add:"-20" %}
+                            <span style="color: green;">A</span>
+                        {% elif paper.marks_obtained >= paper.exam.total_marks|add:"-30" %}
+                            <span style="color: blue;">B+</span>
+                        {% elif paper.marks_obtained >= paper.exam.total_marks|add:"-40" %}
+                            <span style="color: blue;">B</span>
+                        {% elif paper.marks_obtained >= paper.exam.total_marks|add:"-50" %}
+                            <span style="color: orange;">C+</span>
+                        {% elif paper.marks_obtained >= paper.exam.total_marks|add:"-60" %}
+                            <span style="color: orange;">C</span>
+                        {% else %}
+                            <span style="color: red;">F</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ paper.remarks|default:"No remarks" }}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        {% if completed_exams %}
+        <div class="card" style="margin-top: 1rem; background-color: #d4edda; border-color: #c3e6cb;">
+            <h4>Performance Summary</h4>
+            <p><strong>Total Exams Completed:</strong> {{ completed_exams.count }}</p>
+            <p><strong>Average Score:</strong> 
+                {% if average_score %}
+                    {{ average_score|floatformat:2 }}%
+                {% else %}
+                    N/A
+                {% endif %}
+            </p>
+            <p><strong>Highest Score:</strong> 
+                {% if highest_score %}
+                    {{ highest_score.subject.name }}: {{ highest_score.marks_obtained }}/{{ highest_score.exam.total_marks }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
+    {% else %}
+        <p>No exam results available yet.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>Pending Results</h3>
+    {% if pending_results %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Exam Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for paper in pending_results %}
+                <tr>
+                    <td>{{ paper.exam.subject.name }}</td>
+                    <td>{{ paper.exam.start_date }} - {{ paper.exam.end_date }}</td>
+                    <td>
+                        {% if paper.is_allocated and not paper.is_checked %}
+                            <span style="color: orange;">Paper Being Checked</span>
+                        {% elif paper.is_checked and not paper.marks_obtained %}
+                            <span style="color: blue;">Marks Pending</span>
+                        {% else %}
+                            <span style="color: gray;">Processing</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No pending results.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>Quick Actions</h3>
+    <a href="{% url 'student_view_schedule' %}" class="btn">View Exam Schedule</a>
+    <a href="{% url 'student_view_seating' %}" class="btn">View Seating Arrangement</a>
+    <a href="{% url 'student_dashboard' %}" class="btn">Back to Dashboard</a>
+</div>
+{% endblock %}

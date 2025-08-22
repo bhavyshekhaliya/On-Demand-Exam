@@ -1,0 +1,90 @@
+{% extends 'exam_system/base.html' %}
+
+{% block title %}Register for Exam - Student{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Register for Exam</h2>
+    <p>Select and register for available exams.</p>
+</div>
+
+<div class="card">
+    <h3>Available Exams for Registration</h3>
+    {% if available_exams %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Timing</th>
+                    <th>Total Marks</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for exam in available_exams %}
+                <tr>
+                    <td>{{ exam.subject.name }}</td>
+                    <td>{{ exam.start_date }}</td>
+                    <td>{{ exam.end_date }}</td>
+                    <td>{{ exam.start_time }} - {{ exam.end_time }}</td>
+                    <td>{{ exam.total_marks }}</td>
+                    <td>
+                        {% if exam in registrations|dictsort:"exam.id" %}
+                            <span style="color: green;">Already Registered</span>
+                        {% else %}
+                            <form method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="exam_id" value="{{ exam.id }}">
+                                <button type="submit" class="btn btn-success">Register Now</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No exams are currently available for registration.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>Your Current Registrations</h3>
+    {% if current_registrations %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Registration Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for registration in current_registrations %}
+                <tr>
+                    <td>{{ registration.exam.subject.name }}</td>
+                    <td>{{ registration.exam.start_date }}</td>
+                    <td>{{ registration.exam.end_date }}</td>
+                    <td>{{ registration.registration_date|date:"M d, Y" }}</td>
+                    <td>
+                        {% if registration.is_registered %}
+                            <span style="color: green;">Registered</span>
+                        {% else %}
+                            <span style="color: red;">Cancelled</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You haven't registered for any exams yet.</p>
+    {% endif %}
+</div>
+
+<a href="{% url 'student_dashboard' %}" class="btn">Back to Dashboard</a>
+{% endblock %}

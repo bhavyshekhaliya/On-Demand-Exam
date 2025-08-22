@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}On Demand Exam System{% endblock %}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+        }
+        
+        .header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+        }
+        
+        .nav {
+            background-color: #444;
+            padding: 0.5rem;
+        }
+        
+        .nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            margin: 0 0.2rem;
+            border-radius: 3px;
+        }
+        
+        .nav a:hover {
+            background-color: #555;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .card {
+            background: white;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 3px;
+            border: none;
+            cursor: pointer;
+            margin: 0.2rem;
+        }
+        
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+        }
+        
+        .btn-success:hover {
+            background-color: #1e7e34;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        
+        .alert {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 3px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        .table th, .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>On Demand Exam System</h1>
+        {% if user_type %}
+            <p>Welcome, {{ username }} ({{ user_type|title }})</p>
+        {% endif %}
+    </div>
+    
+    {% if user_type %}
+    <div class="nav">
+        {% if user_type == 'admin' %}
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a>
+            <a href="{% url 'admin_exam_setup' %}">Exam Setup</a>
+            <a href="{% url 'admin_publish_schedule' %}">Publish Schedule</a>
+            <a href="{% url 'admin_attendance_sheets' %}">Attendance Sheets</a>
+            <a href="{% url 'admin_seating_arrangement' %}">Seating Arrangement</a>
+            <a href="{% url 'admin_allocate_papers' %}">Allocate Papers</a>
+            <a href="{% url 'admin_pending_tasks' %}">Pending Tasks</a>
+            <a href="{% url 'admin_manage_semesters' %}">Semesters</a>
+            <a href="{% url 'admin_manage_subjects' %}">Subjects</a>
+            <a href="{% url 'admin_manage_faculty' %}">Faculty</a>
+            <a href="{% url 'admin_manage_students' %}">Students</a>
+        {% elif user_type == 'faculty' %}
+            <a href="{% url 'faculty_dashboard' %}">Dashboard</a>
+            <a href="{% url 'faculty_check_papers' %}">Check Papers</a>
+            <a href="{% url 'faculty_enter_marks' %}">Enter Marks</a>
+        {% elif user_type == 'student' %}
+            <a href="{% url 'student_dashboard' %}">Dashboard</a>
+            <a href="{% url 'student_register_exam' %}">Register for Exam</a>
+            <a href="{% url 'student_view_schedule' %}">View Schedule</a>
+            <a href="{% url 'student_view_seating' %}">View Seating</a>
+            <a href="{% url 'student_view_results' %}">View Results</a>
+        {% endif %}
+        <a href="{% url 'logout' %}">Logout</a>
+    </div>
+    {% endif %}
+    
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}error{% else %}success{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>

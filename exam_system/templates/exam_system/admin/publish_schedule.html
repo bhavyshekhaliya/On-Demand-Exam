@@ -1,0 +1,78 @@
+{% extends 'exam_system/base.html' %}
+
+{% block title %}Publish Schedule - Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Publish Exam Schedule</h2>
+    <p>Publish exam schedules to make them visible to students.</p>
+</div>
+
+<div class="card">
+    <h3>Unpublished Exams</h3>
+    {% if exams %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Timing</th>
+                    <th>Total Marks</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for exam in exams %}
+                <tr>
+                    <td>{{ exam.subject.name }}</td>
+                    <td>{{ exam.start_date }}</td>
+                    <td>{{ exam.end_date }}</td>
+                    <td>{{ exam.start_time }} - {{ exam.end_time }}</td>
+                    <td>{{ exam.total_marks }}</td>
+                    <td>
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="exam_id" value="{{ exam.id }}">
+                            <button type="submit" class="btn btn-success">Publish</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>All exams have been published or no exams exist.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>Published Exams</h3>
+    {% if published_exams %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for exam in published_exams %}
+                <tr>
+                    <td>{{ exam.subject.name }}</td>
+                    <td>{{ exam.start_date }}</td>
+                    <td>{{ exam.end_date }}</td>
+                    <td><span style="color: green;">Published</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No exams have been published yet.</p>
+    {% endif %}
+</div>
+
+<a href="{% url 'admin_dashboard' %}" class="btn">Back to Dashboard</a>
+{% endblock %}

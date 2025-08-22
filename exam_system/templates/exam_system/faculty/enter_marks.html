@@ -1,0 +1,79 @@
+{% extends 'exam_system/base.html' %}
+
+{% block title %}Enter Marks - Faculty{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Enter Marks for Checked Papers</h2>
+    <p>Enter marks for papers that have been checked but don't have marks recorded.</p>
+</div>
+
+<div class="card">
+    <h3>Papers Pending Marks Entry</h3>
+    {% if checked_papers %}
+        {% for paper in checked_papers %}
+        {% if not paper.marks_obtained %}
+        <div class="card" style="margin: 1rem 0; border-left: 4px solid #dc3545;">
+            <h4>Paper: {{ paper.student.name }} - {{ paper.exam.subject.name }}</h4>
+            <p><strong>Student:</strong> {{ paper.student.name }} ({{ paper.student.roll_number }})</p>
+            <p><strong>Subject:</strong> {{ paper.exam.subject.name }}</p>
+            <p><strong>Total Marks:</strong> {{ paper.exam.total_marks }}</p>
+            <p><strong>Checked Date:</strong> {{ paper.checked_at|date:"M d, Y" }}</p>
+            <p><strong>Remarks:</strong> {{ paper.remarks|default:"No remarks" }}</p>
+            
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="paper_id" value="{{ paper.id }}">
+                
+                <div class="form-group">
+                    <label for="marks_{{ paper.id }}">Marks Obtained:</label>
+                    <input type="number" name="marks" id="marks_{{ paper.id }}" 
+                           min="0" max="{{ paper.exam.total_marks }}" required>
+                </div>
+                
+                <button type="submit" class="btn btn-success">Save Marks</button>
+            </form>
+        </div>
+        {% endif %}
+        {% endfor %}
+        
+        {% if not checked_papers_without_marks %}
+            <p style="color: green;">✅ All checked papers have marks entered!</p>
+        {% endif %}
+    {% else %}
+        <p>No papers have been checked yet.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>Recently Completed Papers</h3>
+    {% if completed_papers %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Subject</th>
+                    <th>Marks Obtained</th>
+                    <th>Completion Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for paper in completed_papers|slice:":5" %}
+                <tr>
+                    <td>{{ paper.student.name }}</td>
+                    <td>{{ paper.exam.subject.name }}</td>
+                    <td>{{ paper.marks_obtained }}/{{ paper.exam.total_marks }}</td>
+                    <td>{{ paper.checked_at|date:"M d, Y" }}</td>
+                    <td><span style="color: green;">Completed</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No papers have been completed yet.</p>
+    {% endif %}
+</div>
+
+<a href="{% url 'faculty_dashboard' %}" class="btn">Back to Dashboard</a>
+{% endblock %}

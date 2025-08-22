@@ -1,0 +1,124 @@
+{% extends 'exam_system/base.html' %}
+
+{% block title %}Manage Students - Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Manage Students</h2>
+    <p>Add, edit, and manage student accounts.</p>
+</div>
+
+<div class="card">
+    <h3>Add New Student</h3>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add">
+        
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" placeholder="e.g., student1" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" placeholder="Enter password" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="name">Full Name:</label>
+            <input type="text" name="name" id="name" placeholder="e.g., Alice Johnson" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" placeholder="e.g., alice.johnson@university.edu" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="roll_number">Roll Number:</label>
+            <input type="text" name="roll_number" id="roll_number" placeholder="e.g., CS001" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="semester_id">Semester:</label>
+            <select name="semester_id" id="semester_id" required>
+                <option value="">Choose semester...</option>
+                {% for semester in semesters %}
+                    <option value="{{ semester.id }}">{{ semester.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <button type="submit" class="btn btn-success">Add Student</button>
+    </form>
+</div>
+
+<div class="card">
+    <h3>Current Students</h3>
+    {% if students %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Roll Number</th>
+                    <th>Semester</th>
+                    <th>Status</th>
+                    <th>Created Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.username }}</td>
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.email }}</td>
+                    <td>{{ student.roll_number }}</td>
+                    <td>{{ student.semester.name }}</td>
+                    <td>
+                        {% if student.is_active %}
+                            <span style="color: green;">Active</span>
+                        {% else %}
+                            <span style="color: red;">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ student.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="toggle">
+                            <input type="hidden" name="student_id" value="{{ student.id }}">
+                            <button type="submit" class="btn btn-{% if student.is_active %}danger{% else %}success{% endif %}">
+                                {% if student.is_active %}Deactivate{% else %}Activate{% endif %}
+                            </button>
+                        </form>
+                        
+                        {% if not student.is_active %}
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="student_id" value="{{ student.id }}">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to permanently delete this student?')">
+                                Delete
+                            </button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No students created yet.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>Quick Actions</h3>
+    <a href="{% url 'admin_dashboard' %}" class="btn">Back to Dashboard</a>
+    <a href="{% url 'admin_manage_semesters' %}" class="btn">Manage Semesters</a>
+    <a href="{% url 'admin_manage_faculty' %}" class="btn">Manage Faculty</a>
+</div>
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends 'exam_system/base.html' %}
+
+{% block title %}Manage Subjects - Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Manage Subjects</h2>
+    <p>Add, edit, and manage course subjects.</p>
+</div>
+
+<div class="card">
+    <h3>Add New Subject</h3>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add">
+        
+        <div class="form-group">
+            <label for="name">Subject Name:</label>
+            <input type="text" name="name" id="name" placeholder="e.g., Operating Systems" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="code">Subject Code:</label>
+            <input type="text" name="code" id="code" placeholder="e.g., CS301" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="semester_id">Semester:</label>
+            <select name="semester_id" id="semester_id" required>
+                <option value="">Choose semester...</option>
+                {% for semester in semesters %}
+                    <option value="{{ semester.id }}">{{ semester.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <button type="submit" class="btn btn-success">Add Subject</button>
+    </form>
+</div>
+
+<div class="card">
+    <h3>Current Subjects</h3>
+    {% if subjects %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Semester</th>
+                    <th>Status</th>
+                    <th>Created Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subject in subjects %}
+                <tr>
+                    <td>{{ subject.code }}</td>
+                    <td>{{ subject.name }}</td>
+                    <td>{{ subject.semester.name }}</td>
+                    <td>
+                        {% if subject.is_active %}
+                            <span style="color: green;">Active</span>
+                        {% else %}
+                            <span style="color: red;">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ subject.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="toggle">
+                            <input type="hidden" name="subject_id" value="{{ subject.id }}">
+                            <button type="submit" class="btn btn-{% if subject.is_active %}danger{% else %}success{% endif %}">
+                                {% if subject.is_active %}Deactivate{% else %}Activate{% endif %}
+                            </button>
+                        </form>
+                        
+                        {% if not subject.is_active %}
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="subject_id" value="{{ subject.id }}">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to permanently delete this subject?')">
+                                Delete
+                            </button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No subjects created yet.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>Quick Actions</h3>
+    <a href="{% url 'admin_dashboard' %}" class="btn">Back to Dashboard</a>
+    <a href="{% url 'admin_manage_semesters' %}" class="btn">Manage Semesters</a>
+    <a href="{% url 'admin_manage_faculty' %}" class="btn">Manage Faculty</a>
+</div>
+{% endblock %}

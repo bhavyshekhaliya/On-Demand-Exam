@@ -1,0 +1,43 @@
+{% extends 'exam_system/base.html' %}
+
+{% block title %}Home - On Demand Exam System{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Welcome to On Demand Exam System</h2>
+    <p>This system allows students to register for exams on demand, faculty to check papers, and administrators to manage the entire exam process.</p>
+    
+    <div class="grid">
+        <div class="card">
+            <h3>For Students</h3>
+            <p>Register for exams, view schedules, and check your results.</p>
+            <a href="{% url 'login' %}" class="btn btn-success">Student Login</a>
+        </div>
+        
+        <div class="card">
+            <h3>For Faculty</h3>
+            <p>Check exam papers and enter marks for students.</p>
+            <a href="{% url 'login' %}" class="btn btn-success">Faculty Login</a>
+        </div>
+        
+        <div class="card">
+            <h3>For Administrators</h3>
+            <p>Manage exams, schedules, and oversee the entire process.</p>
+            <a href="{% url 'login' %}" class="btn btn-success">Admin Login</a>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h3>System Features</h3>
+        <ul>
+            <li>Flexible exam scheduling</li>
+            <li>Student registration system</li>
+            <li>Automated seating arrangements</li>
+            <li>Attendance tracking</li>
+            <li>Paper allocation to faculty</li>
+            <li>Marks entry and result publication</li>
+            <li>Multi-semester support</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

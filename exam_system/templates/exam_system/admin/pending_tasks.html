@@ -1,0 +1,98 @@
+{% extends 'exam_system/base.html' %}
+
+{% block title %}Pending Tasks - Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Pending Tasks Overview</h2>
+    <p>Monitor papers that need attention from faculty members.</p>
+</div>
+
+<div class="card">
+    <h3>Papers Pending Checking</h3>
+    {% if pending_checking %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Subject</th>
+                    <th>Faculty</th>
+                    <th>Allocation Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for paper in pending_checking %}
+                <tr>
+                    <td>{{ paper.student.name }} ({{ paper.student.roll_number }})</td>
+                    <td>{{ paper.exam.subject.name }}</td>
+                    <td>{{ paper.faculty.name }}</td>
+                    <td>{{ paper.created_at|date:"M d, Y" }}</td>
+                    <td><span style="color: orange;">Allocated, Not Checked</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div class="card" style="margin-top: 1rem; background-color: #fff3cd; border-color: #ffeaa7;">
+            <h4>Summary</h4>
+            <p><strong>Total Papers Pending:</strong> {{ pending_checking.count }}</p>
+            <p><strong>Faculty with Most Pending:</strong> 
+                {% for faculty in faculties_with_pending %}
+                    {{ faculty.name }} ({{ faculty.pending_count }} papers)
+                    {% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+        </div>
+    {% else %}
+        <p style="color: green;">✅ All papers have been checked!</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>Papers Pending Marks Entry</h3>
+    {% if pending_marks %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Subject</th>
+                    <th>Faculty</th>
+                    <th>Checked Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for paper in pending_marks %}
+                <tr>
+                    <td>{{ paper.student.name }} ({{ paper.student.roll_number }})</td>
+                    <td>{{ paper.exam.subject.name }}</td>
+                    <td>{{ paper.faculty.name }}</td>
+                    <td>{{ paper.checked_at|date:"M d, Y" }}</td>
+                    <td><span style="color: red;">Checked, No Marks</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div class="card" style="margin-top: 1rem; background-color: #f8d7da; border-color: #f5c6cb;">
+            <h4>Summary</h4>
+            <p><strong>Total Papers Pending Marks:</strong> {{ pending_marks.count }}</p>
+            <p><strong>Faculty with Most Pending Marks:</strong> 
+                {% for faculty in faculties_with_pending_marks %}
+                    {{ faculty.name }} ({{ faculty.pending_marks_count }} papers)
+                    {% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+        </div>
+    {% else %}
+        <p style="color: green;">✅ All checked papers have marks entered!</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>Quick Actions</h3>
+    <a href="{% url 'admin_allocate_papers' %}" class="btn">Allocate More Papers</a>
+    <a href="{% url 'admin_dashboard' %}" class="btn">Back to Dashboard</a>
+</div>
+{% endblock %}

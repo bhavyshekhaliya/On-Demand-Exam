@@ -1,0 +1,112 @@
+{% extends 'exam_system/base.html' %}
+
+{% block title %}Manage Faculty - Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Manage Faculty</h2>
+    <p>Add, edit, and manage faculty members.</p>
+</div>
+
+<div class="card">
+    <h3>Add New Faculty</h3>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add">
+        
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" placeholder="e.g., faculty1" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" placeholder="Enter password" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="name">Full Name:</label>
+            <input type="text" name="name" id="name" placeholder="e.g., Dr. John Smith" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" placeholder="e.g., john.smith@university.edu" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="department">Department:</label>
+            <input type="text" name="department" id="department" placeholder="e.g., Computer Science" required>
+        </div>
+        
+        <button type="submit" class="btn btn-success">Add Faculty</button>
+    </form>
+</div>
+
+<div class="card">
+    <h3>Current Faculty</h3>
+    {% if faculties %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Department</th>
+                    <th>Status</th>
+                    <th>Created Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for faculty in faculties %}
+                <tr>
+                    <td>{{ faculty.username }}</td>
+                    <td>{{ faculty.name }}</td>
+                    <td>{{ faculty.email }}</td>
+                    <td>{{ faculty.department }}</td>
+                    <td>
+                        {% if faculty.is_active %}
+                            <span style="color: green;">Active</span>
+                        {% else %}
+                            <span style="color: red;">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ faculty.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="toggle">
+                            <input type="hidden" name="faculty_id" value="{{ faculty.id }}">
+                            <button type="submit" class="btn btn-{% if faculty.is_active %}danger{% else %}success{% endif %}">
+                                {% if faculty.is_active %}Deactivate{% else %}Activate{% endif %}
+                            </button>
+                        </form>
+                        
+                        {% if not faculty.is_active %}
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="faculty_id" value="{{ faculty.id }}">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to permanently delete this faculty member?')">
+                                Delete
+                            </button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No faculty members created yet.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>Quick Actions</h3>
+    <a href="{% url 'admin_dashboard' %}" class="btn">Back to Dashboard</a>
+    <a href="{% url 'admin_manage_subjects' %}" class="btn">Manage Subjects</a>
+    <a href="{% url 'admin_manage_students' %}" class="btn">Manage Students</a>
+</div>
+{% endblock %}

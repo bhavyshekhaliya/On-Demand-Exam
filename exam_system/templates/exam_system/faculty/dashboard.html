@@ -1,0 +1,109 @@
+{% extends 'exam_system/base.html' %}
+
+{% block title %}Faculty Dashboard - On Demand Exam System{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Faculty Dashboard</h2>
+    <p>Welcome, {{ faculty.name }}! Here's an overview of your assigned tasks.</p>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>Quick Statistics</h3>
+        <p><strong>Papers Allocated:</strong> {{ allocated_papers.count }}</p>
+        <p><strong>Papers Checked:</strong> {{ checked_papers.count }}</p>
+        <p><strong>Papers Pending:</strong> {{ allocated_papers.count|add:"-"|add:checked_papers.count }}</p>
+    </div>
+    
+    <div class="card">
+        <h3>Quick Actions</h3>
+        <a href="{% url 'faculty_check_papers' %}" class="btn">Check Papers</a>
+        <a href="{% url 'faculty_enter_marks' %}" class="btn">Enter Marks</a>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Recently Allocated Papers</h3>
+    {% if allocated_papers %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Subject</th>
+                    <th>Allocation Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for paper in allocated_papers|slice:":5" %}
+                <tr>
+                    <td>{{ paper.student.name }}</td>
+                    <td>{{ paper.exam.subject.name }}</td>
+                    <td>{{ paper.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        {% if paper.is_checked %}
+                            <span style="color: green;">Checked</span>
+                        {% else %}
+                            <span style="color: orange;">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if not paper.is_checked %}
+                            <a href="{% url 'faculty_check_papers' %}" class="btn btn-success">Check Now</a>
+                        {% else %}
+                            <a href="{% url 'faculty_enter_marks' %}" class="btn">Enter Marks</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No papers allocated to you yet.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>Recently Checked Papers</h3>
+    {% if checked_papers %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Subject</th>
+                    <th>Checked Date</th>
+                    <th>Marks</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for paper in checked_papers|slice:":5" %}
+                <tr>
+                    <td>{{ paper.student.name }}</td>
+                    <td>{{ paper.exam.subject.name }}</td>
+                    <td>{{ paper.checked_at|date:"M d, Y" }}</td>
+                    <td>
+                        {% if paper.marks_obtained %}
+                            {{ paper.marks_obtained }}/{{ paper.exam.total_marks }}
+                        {% else %}
+                            <span style="color: red;">Not Entered</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if not paper.marks_obtained %}
+                            <a href="{% url 'faculty_enter_marks' %}" class="btn btn-success">Enter Marks</a>
+                        {% else %}
+                            <span style="color: green;">Completed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No papers checked yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

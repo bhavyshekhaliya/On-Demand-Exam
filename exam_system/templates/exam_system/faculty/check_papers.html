@@ -1,0 +1,48 @@
+{% extends 'exam_system/base.html' %}
+
+{% block title %}Check Papers - Faculty{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Check Exam Papers</h2>
+    <p>Review and grade the allocated exam papers.</p>
+</div>
+
+<div class="card">
+    <h3>Allocated Papers for Checking</h3>
+    {% if allocated_papers %}
+        {% for paper in allocated_papers %}
+        <div class="card" style="margin: 1rem 0; border-left: 4px solid #007bff;">
+            <h4>Paper: {{ paper.student.name }} - {{ paper.exam.subject.name }}</h4>
+            <p><strong>Student:</strong> {{ paper.student.name }} ({{ paper.student.roll_number }})</p>
+            <p><strong>Subject:</strong> {{ paper.exam.subject.name }}</p>
+            <p><strong>Total Marks:</strong> {{ paper.exam.total_marks }}</p>
+            <p><strong>Allocated Date:</strong> {{ paper.created_at|date:"M d, Y" }}</p>
+            
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="paper_id" value="{{ paper.id }}">
+                
+                <div class="form-group">
+                    <label for="marks_{{ paper.id }}">Marks Obtained:</label>
+                    <input type="number" name="marks" id="marks_{{ paper.id }}" 
+                           min="0" max="{{ paper.exam.total_marks }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="remarks_{{ paper.id }}">Remarks/Comments:</label>
+                    <textarea name="remarks" id="remarks_{{ paper.id }}" rows="3" 
+                              placeholder="Enter any comments or feedback..."></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-success">Mark as Checked</button>
+            </form>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>No papers are currently allocated to you for checking.</p>
+    {% endif %}
+</div>
+
+<a href="{% url 'faculty_dashboard' %}" class="btn">Back to Dashboard</a>
+{% endblock %}
